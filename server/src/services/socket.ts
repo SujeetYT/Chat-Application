@@ -37,11 +37,23 @@ class SocketService {
     console.log("Initializing socket listeners...");
     const io = this.io;
 
-    io.on("connect", (socket) => {
+    io.on("connect", async (socket) => {
       console.log("New socket connection", socket.id);
       socket.on("event:message", async ({message}:{message:string})=>{
         await pub.publish("MESSAGES", JSON.stringify({message:message}))        
       })
+
+      // collect all socket id and push it to redis
+      pub.sadd("SOCKETS", socket.id)
+      
+      // get all active sockets if new connection added
+      const allActiveSockets = await pub.smembers("SOCKETS")
+      io.emit("event:sockets", allActiveSockets);
+
+      socket.on("disconnect", () => {
+        pub.srem("SOCKETS", socket.id)
+        console.log("Socket disconnected", socket.id);
+      });
     });
 
     sub.on("message", (channel, message) => {

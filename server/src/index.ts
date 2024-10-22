@@ -3,19 +3,17 @@ dotenv.config();
 
 import http from 'http';
 import SocketService from './services/socket';
+import express from 'express';
 
-async function startServer() {
-  const httpServer = http.createServer();
-  const PORT = process.env.PORT || 5000;
-  const socketService = new SocketService();
+const PORT = process.env.PORT || 5000;
 
-  socketService.io.attach(httpServer);
-  
+const app = express();
+const httpServer = http.createServer(app);
+const socketService = new SocketService();
 
-  socketService.initListeners();
-  httpServer.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-  });
-}
+socketService.io.attach(httpServer);
 
-startServer();
+socketService.initListeners();
+httpServer.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});

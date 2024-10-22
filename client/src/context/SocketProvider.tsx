@@ -6,9 +6,18 @@ interface SocketProviderProps {
   children?: React.ReactNode;
 }
 
+interface SendMessageInterface{
+  msg: string, 
+  to:string
+}
+
 interface SocketContextInterface {
-  sendMessage: (msg: string) => any;
+  sendMessage: ({msg, to}:SendMessageInterface) => any;
   messages: string[];
+  activeSockets: string[];
+  socket?: Socket;
+  setSendTo?: React.Dispatch<React.SetStateAction<string | null>>;
+  sendTo?: string | null;
 }
 
 export const SocketContext = React.createContext<SocketContextInterface | null>(null);
@@ -17,24 +26,33 @@ export const SocketContext = React.createContext<SocketContextInterface | null>(
 export const SocketProvider: React.FC<SocketProviderProps> = ({children})=>{
   const [socket, setSocket] = React.useState<Socket>();
   const [messages, setMessages] = React.useState<string[]>([]);
-  const sendMessage: SocketContextInterface["sendMessage"] = useCallback((msg)=>{
+  const [activeSockets, setActiveSockets] = React.useState<string[]>([]);
+  const [sendTo, setSendTo] = React.useState<string | null>(null);
+
+
+  const sendMessage: SocketContextInterface["sendMessage"] = useCallback(({msg, to}:SendMessageInterface)=>{
     console.log("Sending message", msg);
     if(socket){
-      socket.emit("event:message", {message: msg});
+      socket.emit("event:message", {message: msg, to: to});
     }
   }, [socket]);
 
   const recieveMessage = useCallback((msg: { message: string }) => {
-    // console.log("Message from server", msg);
     const message = msg.message;
-    // console.log("Actual message", message);
     setMessages((prev) => [...prev, message]);
   }, []);
 
-  useEffect(()=>{    
+  const getAllActiveSockets = useCallback((sockets: string[])=>{
+    console.log("All active sockets", sockets);
+    setActiveSockets(sockets);
+  }, []);
+
+  useEffect(()=>{   
+    // making socket connection to the server 
     const _socket = io(env.SERVER_URL);
     setSocket(_socket);
     _socket.on("event:message", recieveMessage);
+    _socket.on("event:sockets", getAllActiveSockets);
 
     return ()=>{
       setSocket(undefined);
@@ -44,7 +62,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({children})=>{
   }, []);
 
   return (
-    <SocketContext.Provider value={{ sendMessage, messages }}>
+    <SocketContext.Provider value={{ sendTo, setSendTo, socket, sendMessage, messages, activeSockets }}>
       {children}
     </SocketContext.Provider>
   )
