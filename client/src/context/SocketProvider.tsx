@@ -13,11 +13,16 @@ interface SendMessageInterface{
 
 interface SocketContextInterface {
   sendMessage: ({msg, to}:SendMessageInterface) => any;
-  messages: string[];
+  messages: MessageInterface[];
   activeSockets: string[];
   socket?: Socket;
   setSendTo?: React.Dispatch<React.SetStateAction<string | null>>;
   sendTo?: string | null;
+}
+
+export interface MessageInterface {
+  message: string;
+  socketId: string;
 }
 
 export const SocketContext = React.createContext<SocketContextInterface | null>(null);
@@ -25,7 +30,7 @@ export const SocketContext = React.createContext<SocketContextInterface | null>(
 
 export const SocketProvider: React.FC<SocketProviderProps> = ({children})=>{
   const [socket, setSocket] = React.useState<Socket>();
-  const [messages, setMessages] = React.useState<string[]>([]);
+  const [messages, setMessages] = React.useState<MessageInterface[]>([]);
   const [activeSockets, setActiveSockets] = React.useState<string[]>([]);
   const [sendTo, setSendTo] = React.useState<string | null>(null);
 
@@ -37,18 +42,24 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({children})=>{
     }
   }, [socket]);
 
-  const recieveMessage = useCallback((msg: { message: string }) => {
-    const message = msg.message;
+  const recieveMessage = useCallback((msg: MessageInterface) => {
+    // console.log("Recieved message", msg);
+    const message:MessageInterface = msg;
     setMessages((prev) => [...prev, message]);
   }, []);
-
+  console.log("Messages", messages);
+  
   const getAllActiveSockets = useCallback((sockets: string[])=>{
-    console.log("All active sockets", sockets);
+    // console.log("All active sockets", sockets);
     setActiveSockets(sockets);
   }, []);
 
   useEffect(()=>{   
     // making socket connection to the server 
+    if(env.SERVER_URL === ""){
+      console.error("Server URL missing!");
+      return;
+    }
     const _socket = io(env.SERVER_URL);
     setSocket(_socket);
     _socket.on("event:message", recieveMessage);

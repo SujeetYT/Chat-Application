@@ -8,8 +8,9 @@ const Sidebar = () => {
 
   // exclude personal name from the list
   const [allNames, setAllNames] = React.useState<string[]>([]);
-  const { setSendTo, socket, activeSockets } = useSocket();
+  const { sendTo, setSendTo, socket, activeSockets } = useSocket();
   
+  console.log("Active sockets", activeSockets);
   
   const handleSendTo = (name: string) => {
     if (setSendTo) {
@@ -40,6 +41,7 @@ const Sidebar = () => {
             <div
               key={index}
               onClick={()=>handleSendTo(name)}
+              className={`cursor-pointer hover:bg-gray-700 p-2 rounded-lg ${sendTo === name ? "bg-gray-700" : ""}`}
             >
               <PersonDetail name={name}/>
             </div>
