@@ -6,7 +6,8 @@
 ## Features
 * Shows only online people on the sidebar
 * When someone leaves it gets removed from side bar as well
-* And obviousely to chat! 
+* Scalable backend with redis
+* And obviousely to chat!
 
 ## Preview
 Screen is splitted into two
