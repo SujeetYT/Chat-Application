@@ -1,7 +1,7 @@
 # Chat Application
 
 ## High Level System Design
-![image]("./ReadmeAssets/1/png")
+![image]("https://github.com/SujeetYT/Chat-Application/blob/master/ReadmeAssets/1.png")
 
 ## Features
 * Shows only online people on the sidebar
@@ -11,7 +11,7 @@
 ## Preview
 Screen is splitted into two
 
-![image]("./ReadmeAssets/2/png")
+![image]("https://github.com/SujeetYT/Chat-Application/blob/master/ReadmeAssets/2.png")
 
 
 ## How to setup locally
