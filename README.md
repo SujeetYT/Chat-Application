@@ -16,4 +16,30 @@ Screen is splitted into two
 
 ## How to setup locally
 
+#### Clone this project from this repository
+```
+git clone https://github.com/SujeetYT/Chat-Application.git
+```
+
+#### Open two terminal 
+for client 
+```
+cd client
+```
+for server
+```
+cd server
+```
+
+
+#### Create your own environment variable for backend and frontend with the given Keys from ```.env.local``` file
+
+#### Run locally
+
+```
+npm run dev
+```
+
+
+
 
